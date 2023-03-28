@@ -7,12 +7,14 @@ phases:
   pre_build:
     commands:
       - echo "Installing dependencies"
-      - pip install -r Lambda/requirements.txt -t Lambda/
+      - pip install -r Lambda/requirements.txt -t lib
   build:
     commands:
       - echo "Building lambda functions"
-      - cd Lambda && zip -r ../function.zip *
+      - cd lib
+      - zip -r9 ../deployment_package.zip .
+      - zip -r9 ../deployment_package2.zip .
       - cd ..
-artifacts:
-  files:
-    - function.zip
+      - zip -g deployment_package.zip Search-index.py
+      - zip -g deployment_package2.zip index-photos.py
+ 
