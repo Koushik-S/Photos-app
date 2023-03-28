@@ -1,23 +1,18 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
       python: 3.9
+  pre_build:
     commands:
-      - echo "Installing dependencies..."
-      - pip install -r requirements.txt -t lib
+      - echo "Installing dependencies"
+      - pip install -r Lambda/requirements.txt -t Lamba/
   build:
     commands:
-      - echo "Zipping deployment package..."
-      - cd lib
-      - zip -r9 ../deployment_package.zip .
-      - zip -r9 ../deployment_package1.zip .
+      - echo "Building lambda functions"
+      - cd Lambda && zip -r ../function.zip *
       - cd ..
-      - zip -g deployment_package.zip lambda_function.py
-      - zip -g deployment_package1.zip lambda_function1.py
-  post_build:
-    commands:
-      - echo "Updating lambda Function..."
-      - aws lambda update-function-code --function-name index-photos --zip-file fileb://deployment_package.zip
-      - aws lambda update-function-code --function-name search-photos --zip-file fileb://deployment_package1.zip
-      - echo "DONE!!"
+artifacts:
+  files:
+    - function.zip
