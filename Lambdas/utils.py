@@ -8,7 +8,7 @@ import requests
 from requests_aws4auth import AWS4Auth
 
 GLOBAL_INDEX = 0
-URL = 'https://search-photos-lbffn7ibyl5cnd5eqf3b7zeqvy.us-east-1.es.amazonaws.com/photos/{}'
+URL = 'https://https://search-photos-1-c5yptgxsgnvggdfcpwkjktuety.us-east-1.es.amazonaws.com/{}'
 
 def send_signed(method, url, service='es', region='us-east-1', body=None):
     credentials = boto3.Session().get_credentials()
