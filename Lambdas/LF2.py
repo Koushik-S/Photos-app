@@ -23,9 +23,9 @@ def lambda_handler(event, context):
     Return a list of photos, each photo is a dict like
     
     """
-    # query = event['q']
+    query = event['q']
     # print(event)
-    # print(query)
+    print(query)
 
     #user_id = generate_id()
     response = client.recognize_text(
@@ -33,7 +33,7 @@ def lambda_handler(event, context):
             botAliasId='H6XM2RZQ5G', # MODIFY HERE
             localeId='en_US',
             sessionId='testuser3',
-            text="Show me pictures of cat")
+            text=query)
     print(response)
     # {'ResponseMetadata': {'RequestId': 'c79517e8-eb90-41ff-a1db-654099033dd4', 'HTTPStatusCode': 200, 'HTTPHeaders': {'content-type': 'application/json', 'date': 'Thu, 30 Apr 2020 00:49:38 GMT', 'x-amzn-requestid': 'c79517e8-eb90-41ff-a1db-654099033dd4', 'content-length': '291', 'connection': 'keep-alive'}, 'RetryAttempts': 0}, 
     # 'intentName': 'SearchIntent', 'slots': {'objects': 'cats'}, 'message': 'cats', 'messageFormat': 'PlainText', 'dialogState': 'Fulfilled', 'sessionId': '2020-04-30T00:49:38.326Z-MQYjLhNz'}
@@ -59,7 +59,7 @@ def lambda_handler(event, context):
     photo_urls = []
     for photo in photos:
         temp=photo['objectKey']
-        photo_url = 'https://photos-album-6998.s3.amazonaws.com/' + temp
+        photo_url = 'https://photos-bucket-vwks.s3.amazonaws.com/' + temp
         if photo_url not in photo_urls:
             photo_urls.append(photo_url)
     return {
