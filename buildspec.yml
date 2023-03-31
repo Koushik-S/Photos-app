@@ -25,9 +25,9 @@ phases:
   post_build:
     commands:
       - aws s3 cp LF1.zip s3://photos-album-6998-2/LF1_AWS.zip 
-      - aws lambda update-function-code --function-name A2_L1 --s3-bucket photos-album-6998-2 --s3-key LF1_AWS.zip
+      - aws lambda update-function-code --function-name search-photos2 --s3-bucket photos-album-6998-2 --s3-key LF1_AWS.zip
       - aws s3 cp LF2.zip s3://photos-album-6998-2/LF2_AWS.zip
-      - aws lambda update-function-code --function-name A2_L2 --s3-bucket photos-album-6998-2 --s3-key LF2_AWS.zip
+      - aws lambda update-function-code --function-name index-photos2 --s3-bucket photos-album-6998-2 --s3-key LF2_AWS.zip
       
     
     
