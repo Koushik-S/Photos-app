@@ -3,7 +3,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   S3BucketName:
     Type: String
-    Default: photos-bucket-cf-st3523
+    Default: photos-bucket-vwks
 
 Resources:
   AssetsBucket:
@@ -46,47 +46,35 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: photoalbumlambdas
-        S3Key: index-photo.zip
+        S3Bucket: photoalbumlambdas-6998
+        S3Key: index-photos.zip
       Description: Lambda function Index CF
       MemorySize: 128
       Environment:
         Variables:
           REGION: us-east-1
       Handler: lambda_function.lambda_handler
-      Role: 'arn:aws:iam::704995242206:role/service-role/index-photos-role-p7kfyg0h'
+      Role: 'arn:aws:iam::354298500412:role/service-role/index-photos-role-ndgcfhq7'
       Timeout: 30
       Runtime: python3.9
-      FunctionName: index-photos1
+      FunctionName: index-photos2
 
   Lambda2:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: photoalbumlambdas
-        S3Key: search-photo.zip
+        S3Bucket: photoalbumlambdas-6998
+        S3Key: Search_photos.zip
       Description: Lambda function Search CF
       MemorySize: 128
       Environment:
         Variables:
           REGION: us-east-1
       Handler: lambda_function.lambda_handler
-      Role: 'arn:aws:iam::704995242206:role/service-role/search-photos-role-z2eim79w'
+      Role: 'arn:aws:iam::354298500412:role/service-role/Search_photos-role-h9v0l7dk'
       Timeout: 30
       Runtime: python3.9
-      FunctionName: search-photos1
-
-  ESInstance:
-    Type: AWS::OpenSearchService::Domain
-    Properties:
-      DomainName: photos-1
-      ClusterConfig:
-        InstanceType: t3.small.search
-        InstanceCount: 1
-      EBSOptions:
-        EBSEnabled: True
-        VolumeType: gp2
-        VolumeSize: 10
+      FunctionName: search-photos2
 
   Lambda1InvokePermission:
     Type: AWS::Lambda::Permission
@@ -101,6 +89,18 @@ Resources:
       SourceArn:
         Fn::Sub: arn:aws:s3:::${S3BucketName}
 
+  ESInstance:
+    Type: AWS::OpenSearchService::Domain
+    Properties:
+      DomainName: photos-1
+      ClusterConfig:
+        InstanceType: t3.small.search
+        InstanceCount: 1
+      EBSOptions:
+        EBSEnabled: True
+        VolumeType: gp2
+        VolumeSize: 10
+
   APIGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
@@ -113,10 +113,8 @@ Resources:
 
   ApiGatewayRestApi:
     Type: AWS::ApiGateway::RestApi
-    DependsOn:
-      - "Lambda2"
     Properties:
-      Name: "assignment2-cf"
+      Name: "assignment2-final-4"
       ApiKeySourceType: "HEADER"
       BinaryMediaTypes:
         - "image/jpeg"
@@ -173,26 +171,26 @@ Resources:
       AuthorizationType: "NONE"
       ApiKeyRequired: false
       RequestParameters: {}
-      MethodResponses: 
-      - 
-        ResponseModels: 
+      MethodResponses:
+      -
+        ResponseModels:
           "application/json": "Empty"
-        ResponseParameters: 
+        ResponseParameters:
           "method.response.header.Access-Control-Allow-Headers": false
           "method.response.header.Access-Control-Allow-Methods": false
           "method.response.header.Access-Control-Allow-Origin": false
         StatusCode: "200"
-      Integration: 
+      Integration:
         CacheNamespace: !Ref ApiGatewayResourceSearch
-        IntegrationResponses: 
-        - 
-          ResponseParameters: 
-            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        IntegrationResponses:
+        -
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-amz-meta-customLabels'"
             "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'"
             "method.response.header.Access-Control-Allow-Origin": "'*'"
           StatusCode: "200"
         PassthroughBehavior: "WHEN_NO_MATCH"
-        RequestTemplates: 
+        RequestTemplates:
           "application/json": "{\"statusCode\": 200}"
         TimeoutInMillis: 29000
         Type: "MOCK"
@@ -207,67 +205,66 @@ Resources:
       HttpMethod: "GET"
       AuthorizationType: "NONE"
       ApiKeyRequired: false
-      RequestParameters: 
+      RequestParameters:
         "method.request.querystring.q": false
-      MethodResponses: 
-      - 
-        ResponseModels: 
+      MethodResponses:
+      -
+        ResponseModels:
           "application/json": "Empty"
-        ResponseParameters: 
+        ResponseParameters:
           "method.response.header.Access-Control-Allow-Origin": false
         StatusCode: "200"
-      Integration: 
+      Integration:
         CacheNamespace: !Ref ApiGatewayResourceSearch
         ContentHandling: "CONVERT_TO_TEXT"
         IntegrationHttpMethod: "POST"
-        IntegrationResponses: 
-        - 
-          ResponseParameters: 
+        IntegrationResponses:
+        -
+          ResponseParameters:
             "method.response.header.Access-Control-Allow-Origin": "'*'"
           StatusCode: "200"
         PassthroughBehavior: "WHEN_NO_TEMPLATES"
-        RequestTemplates: 
+        RequestTemplates:
           "application/json": |
               {
                    "q": "$input.params('q')"
               }
         TimeoutInMillis: 29000
         Type: "AWS"
-        Uri: !Sub "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:704995242206:function:search-photos1/invocations"
+        Uri: !Sub "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:354298500412:function:search-photos2/invocations"
 
   ApiGatewayMethodPut:
     Type: AWS::ApiGateway::Method
     DependsOn:
       - "ApiGatewayResourceFile"
-      - "IAMRole"
     Properties:
       RestApiId: !Ref ApiGatewayRestApi
       ResourceId: !Ref ApiGatewayResourceFile
       HttpMethod: "PUT"
       AuthorizationType: "NONE"
       ApiKeyRequired: false
-      RequestParameters: 
+      RequestParameters:
         "method.request.header.x-amz-meta-customLabels": false
         "method.request.path.bucket": true
         "method.request.path.filename": true
-      MethodResponses: 
-      - 
-        ResponseModels: 
+      MethodResponses:
+      -
+        ResponseModels:
           "application/json": "Empty"
-        ResponseParameters: 
+        ResponseParameters:
           "method.response.header.Access-Control-Allow-Origin": false
         StatusCode: "200"
-      Integration: 
+      Integration:
         CacheNamespace: !Ref ApiGatewayResourceFile
-        Credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/api-gateway-upload-to-s3-cf"
+        Credentials: !Sub "arn:aws:iam::${AWS::AccountId}:role/api-gateway-upload-to-s3-cf-final"
         IntegrationHttpMethod: "PUT"
-        IntegrationResponses: 
-        - 
-          ResponseParameters: 
+        IntegrationResponses:
+        -
+          ResponseParameters:
             "method.response.header.Access-Control-Allow-Origin": "'*'"
           StatusCode: "200"
         PassthroughBehavior: "WHEN_NO_MATCH"
-        RequestParameters: 
+        RequestParameters:
           "integration.request.header.x-amz-meta-customLabels": "method.request.header.x-amz-meta-customLabels"
           "integration.request.path.bucket": "method.request.path.bucket"
           "integration.request.path.filename": "method.request.path.filename"
@@ -285,28 +282,28 @@ Resources:
       HttpMethod: "OPTIONS"
       AuthorizationType: "NONE"
       ApiKeyRequired: false
-      RequestParameters: 
+      RequestParameters:
         "method.request.header.x-amz-meta-customLabels": false
-      MethodResponses: 
-      - 
-        ResponseModels: 
+      MethodResponses:
+      -
+        ResponseModels:
           "application/json": "Empty"
-        ResponseParameters: 
+        ResponseParameters:
           "method.response.header.Access-Control-Allow-Headers": false
           "method.response.header.Access-Control-Allow-Methods": false
           "method.response.header.Access-Control-Allow-Origin": false
         StatusCode: "200"
-      Integration: 
+      Integration:
         CacheNamespace: !Ref ApiGatewayResourceFile
-        IntegrationResponses: 
-        - 
-          ResponseParameters: 
+        IntegrationResponses:
+        -
+          ResponseParameters:
             "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-Meta-CustomLabels'"
             "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,PUT'"
             "method.response.header.Access-Control-Allow-Origin": "'*'"
           StatusCode: "200"
         PassthroughBehavior: "WHEN_NO_MATCH"
-        RequestTemplates: 
+        RequestTemplates:
           "application/json": "{\"statusCode\": 200}"
         TimeoutInMillis: 29000
         Type: "MOCK"
@@ -315,7 +312,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Path: "/"
-      RoleName: "api-gateway-upload-to-s3-cf"
+      RoleName: "api-gateway-upload-to-s3-cf-final"
       AssumeRolePolicyDocument: "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"sts:AssumeRole\"}]}"
       MaxSessionDuration: 3600
 
@@ -332,9 +329,9 @@ Resources:
             Action:
               - 's3:PutObject'
             Resource: arn:aws:s3:::${S3BucketName}/*
-      Roles: 
+      Roles:
         - !Ref IAMRole
-      
+
 Outputs:
   WebsiteURL:
     Value: !GetAtt
