@@ -40,7 +40,7 @@ def lambda_handler(event, context):
     }
     
     service = 'es'
-    host = 'search-restaurant-g56zesqy2cp7vled5m5ivgpep4.us-east-1.es.amazonaws.com'
+    #https://search-photos-lbffn7ibyl5cnd5eqf3b7zeqvy.us-east-1.es.amazonaws.com/
     region = 'us-east-1'
     credentials = boto3.Session().get_credentials()
     awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
