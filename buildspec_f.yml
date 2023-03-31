@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+
+  build:
+    commands:
+      - echo "Nothing here move to post build"
+
+
+
+  post_build:
+    commands:
+      - aws s3 cp Frontend/index.html s3://photo-search-app-hw2/index.html
+      - aws s3 cp Frontend/main.js s3://photo-search-app-hw2/main.js
+      - aws s3 cp Frontend/main2.js s3://photo-search-app-hw2/main2.js
+      - aws s3 cp Frontend/photo_album.css s3://photo-search-app-hw2/photo_album.css
+      
+    #  - aws s3 cp LF1.zip s3://photos-bucket-ks/LF1_AWS.zip
+     # - aws lambda update-function-code --function-name test-lf1 --s3-bucket photos-bucket-ks --s3-key LF1_AWS.zip
+     # - aws s3 cp LF2.zip s3://photos-bucket-ks/LF2_AWS.zip
+     # - aws lambda update-function-code --function-name index-photos1 --s3-bucket photos-bucket-ks --s3-key LF2_AWS.zip
