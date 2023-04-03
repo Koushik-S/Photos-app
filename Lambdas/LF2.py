@@ -51,7 +51,15 @@ def lambda_handler(event, context):
     for key, val in response['sessionState']['intent']['slots'].items():
         if val != None:
             slots.append(val['value']['originalValue'])
-    
+    slots2=[]
+    for term in slots:
+        if term[-1]=='s':
+            temp=term[0:len(term)-1]
+            slots2.append(temp)
+        if term[len(term)-2:]=='es':
+            temp=term[0:len(term)-2]
+            slots2.append(temp)
+    slots=slots+slots2
     print("slots: ", slots)
 
     photos = es_search_photo_by_label([slot for slot in slots if slot])
