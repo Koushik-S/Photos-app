@@ -2,7 +2,7 @@ import boto3
 import json
 from requests_aws4auth import AWS4Auth
 from opensearchpy import OpenSearch, RequestsHttpConnection
-
+#Cloning CHECK
 def lambda_handler(event, context):
     # Get the S3 bucket and key from the event
 
